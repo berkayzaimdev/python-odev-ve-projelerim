@@ -2,11 +2,13 @@ from tkinter.ttk import *
 from tkinter import messagebox
 from tkinter import *
 
+toplam=0
+
 
 class SButton(Button):
     def __init__(self,parent,*args,**kwargs):
         Button.__init__(self,parent,*args,**kwargs)
-        self["bg"]="#3700b3"
+        self["bg"]="#1834F3"
         self["fg"]="white"
         self["font"]=("Verdana",10,"bold")
         self["width"]=20
@@ -15,27 +17,51 @@ class SButton(Button):
         self.bind("<Enter>",self.hover)
         self.bind("<Leave>",self.unhover)
     def hover(self,event):
-        self.config(bg="#6200ee")
+        self.config(bg="#3371FF")
     def unhover(self,event):
-        self.config(bg="#3700b3")
+        self.config(bg="#1834F3")
 
 
 def total():
-    sonuc=messagebox.askyesno("Çıkış Yap","Emin misiniz?")
-    if sonuc:
-        pencere.destroy()
+    mesaj = "Elde Edilen Toplam Gelir:"+str(toplam)+" bin TL"
+    messagebox.showinfo("Toplam Gelir", mesaj)
 
 
 def rezerve():
-    sonuc=messagebox.askyesno("Çıkış Yap","Emin misiniz?")
-    if sonuc:
-        pencere.destroy()
+    hatalar=""
+    if rb.get()==0:
+        hatalar+="Lütfen konaklayacağınız yeri seçiniz!\n"
+    if values[cmb.get()]==-1:
+        hatalar+="Lütfen konaklama tipi seçiniz!\n"
+    for text in frame_secim.winfo_children():
+        if isinstance(text, Text):
+            s = text.get(1.0, END)
+            if s.strip() == "":
+                hatalar+="Lütfen boş alan bırakmayınız!\n"
+                break
+    if not (text_yetiskin.get(1.0, END).rstrip().isdigit() and text_cocuk.get(1.0, END).rstrip().isdigit() and text_c.get(1.0, END).rstrip().isdigit()):
+        hatalar+="Lütfen kişi ve konaklanacak gün bilgisini sayısal olarak giriniz!\n"
+    if hatalar == "":
+        global toplam
+        sonuc = int(text_c.get(1.0, END)) * (rb.get()+values[cmb.get()]) * (2 * int(text_yetiskin.get(1.0, END)) + int(text_cocuk.get(1.0, END)) )
+        toplam+=sonuc
+        mesaj = "Gelir:" + str(sonuc) + " bin TL"
+        messagebox.showinfo("Rezervasyon Başarılı", mesaj)
+    else:
+        messagebox.showwarning("Hata",hatalar.rstrip())
 
 
 def reset():
-    sonuc=messagebox.askyesno("Çıkış Yap","Emin misiniz?")
-    if sonuc:
-        pencere.destroy()
+    global toplam
+    toplam=0
+    ico.config(image=icon)
+    resim.config(image=o0)
+    cmb.set("Seçiniz")
+    rb.set(0)
+    for element in frame_secim.winfo_children():
+        if isinstance(element, Text):
+            element.delete(1.0, END)
+    messagebox.showinfo("İşlem Başarılı","Tüm seçimleriniz sıfırlandı!")
 
 
 def cikis():
@@ -58,14 +84,13 @@ def on_select(event):
     p=PhotoImage(file='icons/i' + selected_value.lower().replace(" ","") + '.png')
     ico.config(image=p)
     ico.image = p
-    print(values[selected_value])
 
 
 pencere = Tk()
 pencere.title("Otel Rezervasyon")
 
 
-frame_resim = Frame(pencere)
+frame_resim = Frame(pencere,pady=10,padx=10)
 o0=PhotoImage(name="Temp",file="icons/temp.gif")
 o1=PhotoImage(name="Bodrum",file="icons/bodrum.gif")
 o2=PhotoImage(name="Çeşme",file="icons/çeşme.gif")
@@ -73,30 +98,30 @@ o3=PhotoImage(name="Marmaris",file="icons/marmaris.gif")
 resim = Label(frame_resim,image=o0)
 resim.pack()
 
-i=0;
 
-frame_secim =Frame(pencere)
-label_soyad=Label(frame_secim,text="Ad:").grid(column=0,row=i)
-text_ad=Text(frame_secim,width=15,height=1).grid(column=1,row=i,pady=5)
+i=0;
+frame_secim =Frame(pencere,pady=10,padx=10)
+label_soyad=Label(frame_secim,text="Ad:",font="Verdana 9").grid(column=0,row=i)
+text_ad=Text(frame_secim,width=15,height=1,font="Verdana 9").grid(column=1,row=i,pady=5)
 i+=1
-label_soyad=Label(frame_secim,text="Soyad:").grid(column=0,row=i)
-text_soyad=Text(frame_secim,width=15,height=1).grid(column=1,row=i,pady=5)
+label_soyad=Label(frame_secim,text="Soyad:",font="Verdana 9").grid(column=0,row=i)
+text_soyad=Text(frame_secim,width=15,height=1,font="Verdana 9").grid(column=1,row=i,pady=5)
 i+=1
-label_adres=Label(frame_secim,text="Adres:").grid(column=0,row=i)
-text_adres=Text(frame_secim,width=15,height=1).grid(column=1,row=i,pady=5)
+label_adres=Label(frame_secim,text="Adres:",font="Verdana 9").grid(column=0,row=i)
+text_adres=Text(frame_secim,width=15,height=1,font="Verdana 9").grid(column=1,row=i,pady=5)
 
 
 rb = IntVar()
-rb_buttons = [Radiobutton(frame_secim, text="Bodrum", variable=rb, value=5, command=resimDegis),
-              Radiobutton(frame_secim, text="Çeşme", variable=rb, value=3, command=resimDegis),
-              Radiobutton(frame_secim, text="Marmaris", variable=rb, value=1, command=resimDegis)]
+rb_buttons = [Radiobutton(frame_secim, text="Bodrum", variable=rb, value=5, command=resimDegis,font="Verdana 9"),
+              Radiobutton(frame_secim, text="Çeşme", variable=rb, value=3, command=resimDegis,font="Verdana 9"),
+              Radiobutton(frame_secim, text="Marmaris", variable=rb, value=1, command=resimDegis,font="Verdana 9")]
 
 for i, button in enumerate(rb_buttons):
     button.grid(column=0,row=i+3,columnspan=2)
 
 i+=4
 values = {"Seçiniz": -1, "Family": 0, "Deluxe": 1,"King Suit": 2}
-cmb=Combobox(frame_secim, values=list(values.keys()),state="readonly")
+cmb=Combobox(frame_secim, values=list(values.keys()),state="readonly",font="Verdana 9")
 cmb.current(0)
 
 
@@ -108,14 +133,17 @@ ico.grid(column=1,row=i,pady=5)
 
 
 i+=1
-label_adres=Label(frame_secim,text="Yetişkin sayısı:").grid(column=0,row=i)
-text_adres=Text(frame_secim,width=15,height=1).grid(column=1,row=i,pady=5)
+label_yetiskin=Label(frame_secim,text="Yetişkin sayısı:",font="Verdana 9").grid(column=0,row=i)
+text_yetiskin=Text(frame_secim,width=15,height=1,font="Verdana 9")
+text_yetiskin.grid(column=1,row=i,pady=5)
 i+=1
-label_adres=Label(frame_secim,text="Çocuk sayısı:").grid(column=0,row=i)
-text_adres=Text(frame_secim,width=15,height=1).grid(column=1,row=i,pady=5)
+label_cocuk=Label(frame_secim,text="Çocuk sayısı:",font="Verdana 9").grid(column=0,row=i)
+text_cocuk=Text(frame_secim,width=15,height=1,font="Verdana 9")
+text_cocuk.grid(column=1,row=i,pady=5)
 i+=1
-label_adres=Label(frame_secim,text="Kaç gece kalacaksınız?:").grid(column=0,row=i)
-text_adres=Text(frame_secim,width=15,height=1).grid(column=1,row=i,pady=5)
+label_c=Label(frame_secim,text="Kaç gece kalacaksınız?:",font="Verdana 9").grid(column=0,row=i)
+text_c=Text(frame_secim,width=15,height=1,font="Verdana 9")
+text_c.grid(column=1,row=i,pady=5)
 
 
 i+=1
@@ -131,66 +159,3 @@ b4=Button(frame_secim,text="ÇIKIŞ",background="#E33437",borderwidth=0,width=20
 frame_resim.grid(row=0,column=0)
 frame_secim.grid(row=0,column=1)
 pencere.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-'''rb=IntVar()
-rb1=Radiobutton(frame_secim,text="Bodrum",variable=rb,value=5,command=resimDegis).grid(column=0,row=3,columnspan=2,sticky="W")
-rb2=Radiobutton(frame_secim,text="Çeşme",variable=rb,value=3,command=resimDegis).grid(column=0,row=4,columnspan=2,sticky="W")
-rb3=Radiobutton(frame_secim,text="Marmaris",variable=rb,value=1,command=resimDegis).grid(column=0,row=5,columnspan=2,sticky="W")
-'''
-'''
-for i, button in enumerate(rb):
-    button.grid(column=0,row=i+3,columnspan=2,sticky="W")
-'''
-'''
-values = {"Seçiniz": -1, "Family": 0, "Deluxe": 1,"King Suit": 2}
-cmb=Combobox(frame_secim, values=list(values.keys()),state="readonly")
-cmb.current(0)
-def on_select(event):
-    print(values[cmb.get()])
-cmb.bind("<<ComboboxSelected>>", on_select)
-cmb.grid(column=0,row=6,columnspan=2)
-
-'''
-
-
-
-'''
-class ImageCombobox(Combobox):
-    def __init__(self, master=None, **kw):
-        super().__init__(master, **kw)
-        self.icons = {}
-
-    def insert(self, index, item, icon=None):
-        self.icons[item] = icon
-        super().insert(index, item)
-
-    def set(self, item):
-        super().set(item)
-        self.config(image=self.icons.get(item))
-
-values = {"Seçiniz": -1, "Family": 0, "Deluxe": 1,"King Suit": 2}
-cmb = ImageCombobox(frame_secim, values=list(values.keys()), state="readonly")
-cmb.current(0)
-
-cmb.insert(0, 'Seçiniz', PhotoImage(file=''))
-cmb.insert(1, 'Family', PhotoImage(file='icons/family.png'))
-cmb.insert(2, 'Deluxe', PhotoImage(file='icons/deluxe.png'))
-cmb.insert(3, 'King Suit', PhotoImage(file='icons/kingsuit.png'))
-
-def on_select(event):
-    print(values[cmb.get()])
-
-cmb.bind("<<ComboboxSelected>>", on_select)
-cmb.grid(column=0,row=6,columnspan=2)
-'''
